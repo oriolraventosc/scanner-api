@@ -1,0 +1,3 @@
+# SCANNER-API
+
+## Endpoints
