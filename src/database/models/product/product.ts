@@ -8,6 +8,7 @@ const productSchema = new Schema({
   brand: String,
   weight: Number,
   benefits: [String],
+  ean: String,
 });
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
