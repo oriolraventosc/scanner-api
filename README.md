@@ -2,6 +2,6 @@
 
 ## Endpoints
 
-### loadProduct
+### GET loadProduct
 
 #### /product/:id?brand
