@@ -19,9 +19,9 @@ const connectToDatabase = async (url: string) => {
         return ret;
       },
     });
-    debug(chalk.blueBright("Connected to the data base"));
+    debug("Connected to the data base");
   } catch {
-    debug(chalk.red("Error connecting with the data base"));
+    debug("Error connecting with the data base");
   }
 };
 
