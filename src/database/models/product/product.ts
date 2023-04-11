@@ -3,12 +3,12 @@ import { Schema, model } from "mongoose";
 const productSchema = new Schema({
   name: String,
   image: String,
-  price: Number,
   ingredients: String,
-  brand: String,
+  brand: [String],
   weight: Number,
   benefits: [String],
   ean: String,
+  status: String,
 });
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
