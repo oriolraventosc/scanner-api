@@ -1,3 +1,4 @@
+import cors from "cors";
 import morgan from "morgan";
 import express from "express";
 import routes from "./routes/routes.js";
@@ -11,6 +12,6 @@ app.use(morgan("dev"));
 
 app.use(express.json());
 
-app.use(routes.productsRouter, productsRouter);
+app.use(routes.productsRouter, cors(), productsRouter);
 
 export default app;
