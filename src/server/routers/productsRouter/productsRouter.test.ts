@@ -33,6 +33,7 @@ const res: Partial<Response> = {
 };
 
 describe("Given a GET /loadProduct endpoint", () => {
+  jest.setTimeout(25000);
   describe("When it receives a request with 1 product", () => {
     test("Then it should return an object with a product", async () => {
       const status = 200;

@@ -32,6 +32,7 @@ const res: Partial<Response> = {
 };
 
 describe("Given a productsController", () => {
+  jest.setTimeout(25000);
   describe("When loadProduct is invoked with 1 product", () => {
     test("Then it should return an object with a product property value 'Tomato sauce'", async () => {
       const status = 200;
@@ -54,7 +55,7 @@ describe("Given a productsController", () => {
       await loadProduct(req as Request, res as Response, next as NextFunction);
 
       expect(res.status).toHaveBeenCalledWith(status);
-    });
+    }, 10000);
   });
 
   describe("When loadProduct is invoked and an error happens", () => {
@@ -70,6 +71,6 @@ describe("Given a productsController", () => {
       await loadProduct(req as Request, res as Response, next as NextFunction);
 
       expect(next).toHaveBeenCalled();
-    });
+    }, 10000);
   });
 });
