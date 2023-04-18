@@ -3,6 +3,7 @@ export const productMock = {
   image: "tomato.jpg",
   ingredients: "Ecologic tomato (90%), salt (5%), water (5%)",
   brand: ["Mercadona", "Condis", "Eroski", "Dia"],
+  description: "",
   weight: 100,
   benefits: ["Healthy"],
   ean: "12345678900",

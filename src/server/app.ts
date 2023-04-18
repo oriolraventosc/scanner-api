@@ -3,6 +3,7 @@ import morgan from "morgan";
 import express from "express";
 import routes from "./routes/routes.js";
 import productsRouter from "./routers/productsRouter/productsRouter.js";
+import generalError from "./middlewares/error/error.js";
 
 const app = express();
 
