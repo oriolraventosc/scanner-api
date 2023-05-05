@@ -10,6 +10,8 @@ const productSchema = new Schema({
   benefits: [String],
   ean: String,
   status: String,
+  howToUse: String,
+  sideEffects: String,
 });
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
