@@ -1,6 +1,7 @@
 const routes = {
   productsRouter: "/product",
-  loadProduct: "/:id",
+  loadProduct: "/:name",
+  search: "/search",
 };
 
 export default routes;
