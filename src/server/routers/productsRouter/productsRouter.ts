@@ -9,7 +9,7 @@ import routes from "../../routes/routes.js";
 // eslint-disable-next-line new-cap
 const productsRouter = express.Router();
 
-// ProductsRouter.get(routes.loadProduct, loadProduct);
+productsRouter.get(routes.scanProduct, scanProduct);
 
 productsRouter.get(routes.search, searchBar);
 productsRouter.get(routes.loadProduct, loadProduct);
