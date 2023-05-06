@@ -13,7 +13,7 @@ export const scanProduct = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { id } = req.params;
+  const { id } = req.query;
   try {
     const productInformation = await Product.findOne({ ean: id });
     if (!productInformation) {
