@@ -5,6 +5,7 @@ export interface UserStructure {
   email: string;
   password: string;
   name: string;
+  favouriteProducts: ProductStructure[];
 }
 
 export interface UserTokenPayload extends JwtPayload {
