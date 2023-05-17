@@ -54,7 +54,12 @@ export const login = async (
     const accessToken = jwt.sign(tokenPayload, enviroment.secretKey, {
       expiresIn: "3d",
     });
-    res.status(200).json({ accessToken, id: user._id.toString() });
+    res.status(200).json({
+      accessToken,
+      id: user._id.toString(),
+      name: user.name,
+      favouriteProducts: user.favouriteProducts,
+    });
   } catch {
     const error = new CustomError(
       "An error ocurred while logging in!",
@@ -72,7 +77,7 @@ export const register = async (
 ) => {
   const { email, name, password } = req.body as UserStructure;
   try {
-    if (!email || !password) {
+    if (!email || !password || !name) {
       const error = new CustomError(
         "Missing credentials",
         401,
@@ -87,6 +92,8 @@ export const register = async (
     const newUser = await User.create({
       email,
       password: hashedPassword,
+      name,
+      favouriteProducts: [],
     });
 
     res.status(201).json({ newUser });

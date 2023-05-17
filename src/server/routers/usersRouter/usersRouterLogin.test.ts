@@ -48,6 +48,7 @@ describe("Given a POST '/login' endpoint", () => {
       const registerData = {
         email: "climber@gmail.com",
         password: hashedPassword,
+        name: "climber",
       };
       await User.create(registerData);
       const req: Partial<Request> = {
