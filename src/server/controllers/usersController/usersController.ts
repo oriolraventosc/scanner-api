@@ -59,6 +59,7 @@ export const login = async (
       id: user._id.toString(),
       name: user.name,
       favouriteProducts: user.favouriteProducts,
+      email: user.email,
     });
   } catch {
     const error = new CustomError(
