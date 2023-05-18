@@ -6,6 +6,7 @@ const routes = {
   login: "/login",
   register: "/register",
   usersRouter: "/user",
+  favouriteProducts: "/favourite-products/:email",
 };
 
 export default routes;

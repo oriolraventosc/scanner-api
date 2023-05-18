@@ -2,11 +2,18 @@ import type { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
-import { loadProduct, scanProduct, searchBar } from "./productsController";
+import {
+  loadProduct,
+  scanProduct,
+  searchBar,
+  loadFavouriteProducts,
+} from "./productsController";
 import Product from "../../../database/models/product/product";
 import CustomError from "../../customError/customError";
 import { productMock } from "../../../mocks/productMock/productMock";
 import connectToDatabase from "../../../database";
+import User from "../../../database/models/user/user";
+import { userMock } from "../../../mocks/usersMock/usersMock";
 
 let server: MongoMemoryServer;
 
@@ -152,5 +159,63 @@ describe("Given a productsController", () => {
 
       expect(next).toHaveBeenCalled();
     }, 10000);
+  });
+
+  describe("When loadFavouriteProducts is invoked with 1 favourite product", () => {
+    test("Then it should return a user with 1 favourite product", async () => {
+      const status = 200;
+      const req: Partial<Request> = {
+        params: { email: "user@gmail.com" },
+      };
+
+      User.findOne = jest.fn().mockReturnValue(userMock);
+      await loadFavouriteProducts(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(res.status).toHaveBeenCalledWith(status);
+    });
+  });
+
+  describe("When loadFavouriteProducts is invoked with 0 favourite products", () => {
+    test("Then it should show a user without any favourite product", async () => {
+      const status = 204;
+      const req: Partial<Request> = {
+        params: { email: "user@gmail.com" },
+      };
+
+      User.findOne = jest.fn().mockReturnValue(userMock);
+      await loadFavouriteProducts(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(res.status).toHaveBeenCalledWith(status);
+    });
+  });
+
+  describe("When loadFavouriteProducts is invoked and an internal server error ocurres", () => {
+    test("Then it should call it's next method with an error", async () => {
+      const error = new CustomError(
+        "An error ocurred loading favourite products...",
+        500,
+        "An error ocurred loading favourite products..."
+      );
+      const req: Partial<Request> = {
+        params: { email: "user@gmail.com" },
+      };
+
+      User.findOne = jest.fn().mockRejectedValue(error);
+      await loadFavouriteProducts(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(next).toHaveBeenCalled();
+    });
   });
 });
