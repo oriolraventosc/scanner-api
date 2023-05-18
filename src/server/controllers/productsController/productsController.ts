@@ -5,6 +5,7 @@ import debugCreator from "debug";
 import enviroment from "../../../loadEnviroment.js";
 import generalError from "../../middlewares/error/error.js";
 import CustomError from "../../customError/customError.js";
+import User from "../../../database/models/user/user.js";
 
 const debug = debugCreator(`${enviroment.debug}productsController`);
 
@@ -95,6 +96,33 @@ export const loadProduct = async (
       "An error ocurred loading product...",
       500,
       "An error ocurred loading product..."
+    );
+    next(error);
+  }
+};
+
+export const loadFavouriteProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email } = req.params;
+  try {
+    const user = await User.findOne({ email });
+    if (user.favouriteProducts.length === 0) {
+      res.status(204).json({
+        user,
+      });
+    }
+
+    res.status(200).json({
+      user,
+    });
+  } catch {
+    const error = new CustomError(
+      "An error ocurred loading favourite products...",
+      500,
+      "An error ocurred loading favourite products..."
     );
     next(error);
   }

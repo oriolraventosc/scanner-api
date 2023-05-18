@@ -1,4 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import enviroment from "../../../loadEnviroment";
 import request from "supertest";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
@@ -8,6 +10,10 @@ import { productMock } from "../../../mocks/productMock/productMock";
 import connectToDatabase from "../../../database";
 import app from "../../app";
 import routes from "../../routes/routes";
+import User from "../../../database/models/user/user";
+import { userMock } from "../../../mocks/usersMock/usersMock";
+
+const { secretKey } = enviroment;
 
 let server: MongoMemoryServer;
 
@@ -31,6 +37,13 @@ const res: Partial<Response> = {
   status: jest.fn().mockReturnThis(),
   json: jest.fn(),
 };
+
+const userId = 12345;
+
+const userToken = jwt.sign(
+  { email: "user@gmail.com", id: userId.toString() },
+  secretKey
+);
 
 describe("Given a GET /scanProduct endpoint", () => {
   jest.setTimeout(25000);
@@ -159,6 +172,42 @@ describe("Given a GET /:name endpoint", () => {
 
       const response = await request(app)
         .get(`${routes.productsRouter}/product`)
+        .expect(status);
+
+      expect(response.statusCode).toBe(status);
+    });
+  });
+});
+
+describe("Given a GET /favourite-products/:email endpoint", () => {
+  jest.setTimeout(25000);
+  describe("When it receives a request with 0 favourite product", () => {
+    test("Then it should return a user with 0 favourite product", async () => {
+      const status = 204;
+      User.findOne = jest.fn().mockReturnValue(userMock);
+
+      const response = await request(app)
+        .get(`${routes.productsRouter}/favourite-products/user@gmail.com`)
+        .set("Authorization", `Bearer ${userToken}`)
+        .expect(status);
+
+      expect(response.statusCode).toBe(status);
+    });
+  });
+
+  describe("When it receives a request and an internal server error ocurres", () => {
+    test("Then it should return an error", async () => {
+      const status = 500;
+      const error = new CustomError(
+        "An error ocurred loading favourite products...",
+        500,
+        "An error ocurred loading favourite products..."
+      );
+      User.findOne = jest.fn().mockRejectedValue(error);
+
+      const response = await request(app)
+        .get(`${routes.productsRouter}/favourite-products/user@gmail.com`)
+        .set("Authorization", `Bearer ${userToken}`)
         .expect(status);
 
       expect(response.statusCode).toBe(status);
