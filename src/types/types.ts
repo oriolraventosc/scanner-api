@@ -22,6 +22,9 @@ export interface ProductStructure {
   weight: number;
   benefits: string[];
   ean: string;
+  status: string;
+  howToUse: string;
+  sideEffects: string;
 }
 
 export interface CustomRequest extends Request {
