@@ -7,6 +7,8 @@ import {
   scanProduct,
   searchBar,
   loadFavouriteProducts,
+  addToFavourites,
+  deleteFavouriteProduct,
 } from "./productsController";
 import Product from "../../../database/models/product/product";
 import CustomError from "../../customError/customError";
@@ -210,6 +212,98 @@ describe("Given a productsController", () => {
 
       User.findOne = jest.fn().mockRejectedValue(error);
       await loadFavouriteProducts(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe("When addToFavourites is invoked with 1 product", () => {
+    test("Then it should add the product to the user favourite products list", async () => {
+      const status = 200;
+      const req: Partial<Request> = {
+        params: {
+          email: "oriolraventoscollell@gmail.com",
+          product: "8711197232120",
+        },
+      };
+
+      User.findOne = jest.fn().mockReturnValue(userMock);
+      Product.findOne = jest.fn().mockReturnValue(productMock);
+      User.findByIdAndUpdate = jest.fn().mockReturnValue(userMock);
+
+      await addToFavourites(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(res.status).toHaveBeenCalledWith(status);
+    });
+  });
+
+  describe("When addFavourites is invoked and and internal server error ocurres", () => {
+    test("Then it should return an error", async () => {
+      const error = new CustomError(
+        "We could not add the product to favourites",
+        500,
+        "We could not add the product to favourites"
+      );
+      const req: Partial<Request> = {
+        params: { email: "user@gmail.com", product: "8711197232120" },
+      };
+
+      User.findOne = jest.fn().mockRejectedValue(error);
+      await addToFavourites(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe("When deleteFavouriteProduct is invoked and 1 product is found", () => {
+    test("Then 1 product should be deleted", async () => {
+      const status = 200;
+      const req: Partial<Request> = {
+        params: {
+          email: "oriolraventoscollell@gmail.com",
+          product: "8711197232120",
+        },
+      };
+
+      User.findOne = jest.fn().mockReturnValue(userMock);
+      Product.findOne = jest.fn().mockReturnValue(productMock);
+      User.findByIdAndUpdate = jest.fn().mockReturnValue(userMock);
+
+      await deleteFavouriteProduct(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(res.status).toHaveBeenCalledWith(status);
+    });
+  });
+
+  describe("When addFavourites is invoked and and internal server error ocurres", () => {
+    test("Then it should return an error", async () => {
+      const error = new CustomError(
+        "We could not delete the product from favourites",
+        500,
+        "We could not delete the product from favourites"
+      );
+      const req: Partial<Request> = {
+        params: { email: "user@gmail.com", product: "8711197232120" },
+      };
+
+      User.findOne = jest.fn().mockRejectedValue(error);
+      await deleteFavouriteProduct(
         req as Request,
         res as Response,
         next as NextFunction
