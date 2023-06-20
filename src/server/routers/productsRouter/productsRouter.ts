@@ -18,7 +18,7 @@ productsRouter.get(routes.scanProduct, scanProduct);
 productsRouter.get(routes.search, searchBar);
 productsRouter.get(routes.loadProduct, loadProduct);
 productsRouter.get(routes.favouriteProducts, auth, loadFavouriteProducts);
-productsRouter.patch(routes.addToFavourites, auth, addToFavourites);
-productsRouter.patch(routes.deleteFromFavourites, auth, deleteFavouriteProduct);
+productsRouter.patch(routes.addToFavourites, addToFavourites);
+productsRouter.patch(routes.deleteFromFavourites, deleteFavouriteProduct);
 
 export default productsRouter;
