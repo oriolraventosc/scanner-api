@@ -3,9 +3,9 @@ import Product from "../../../database/models/product/product.js";
 import type { ProductStructure } from "../../../types/types";
 import debugCreator from "debug";
 import enviroment from "../../../loadEnviroment.js";
-import generalError from "../../middlewares/error/error.js";
 import CustomError from "../../customError/customError.js";
 import User from "../../../database/models/user/user.js";
+import ScanProduct from "../../../database/models/scanProduct/scanProduct.js";
 
 const debug = debugCreator(`${enviroment.debug}productsController`);
 
@@ -47,7 +47,8 @@ export const searchBar = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { name } = req.query;
+  const { name, limit } = req.query;
+  const limitNumber = limit || 10;
   try {
     const products = await Product.find({
       name,
@@ -62,7 +63,7 @@ export const searchBar = async (
     }
 
     res.status(200).json({
-      productsList: products,
+      productsList: products.slice(0, Number(limitNumber)),
       productInformation: [],
     });
   } catch {
@@ -111,8 +112,12 @@ export const loadFavouriteProducts = async (
   next: NextFunction
 ) => {
   const { email } = req.params;
+  const { limit } = req.query;
+  const limitNumber = limit || 10;
+
   try {
     const user = await User.findOne({ email });
+    const { favouriteProducts, name, password } = user;
     if (user.favouriteProducts.length === 0) {
       res.status(204).json({
         user,
@@ -120,7 +125,12 @@ export const loadFavouriteProducts = async (
     }
 
     res.status(200).json({
-      user,
+      user: {
+        name,
+        password,
+        email,
+        favouriteProducts: favouriteProducts.slice(0, Number(limitNumber)),
+      },
     });
   } catch {
     const error = new CustomError(
@@ -188,6 +198,53 @@ export const deleteFavouriteProduct = async (
       "We could not delete the product from favourites",
       500,
       "We could not delete the product from favourites"
+    );
+    next(error);
+  }
+};
+
+export const searchProductsByStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { limit, status } = req.query;
+  const limitNumber = limit || 10;
+  try {
+    const scanProducts = await ScanProduct.find({ status });
+    const products = await Product.find({ status });
+    if (products.length === 0 && scanProducts.length === 0) {
+      res.status(200).json({
+        scanProducts: [],
+        products: [],
+      });
+    }
+
+    if (products.length === 0 && scanProducts.length > 0) {
+      res.status(200).json({
+        products: [],
+        scanProducts: scanProducts.slice(0, Number(limitNumber)),
+      });
+    }
+
+    if (products.length > 0 && scanProducts.length === 0) {
+      res.status(200).json({
+        scanProducts: [],
+        products: products.slice(0, Number(limitNumber)),
+      });
+    }
+
+    if (products.length > 0 && scanProducts.length > 0) {
+      res.status(200).json({
+        scanProducts: scanProducts.splice(0, Number(limitNumber)),
+        products: products.slice(0, Number(limitNumber)),
+      });
+    }
+  } catch {
+    const error = new CustomError(
+      "We could not find any product and supplement",
+      500,
+      "We could not find any product and supplement"
     );
     next(error);
   }

@@ -6,6 +6,7 @@ import {
   loadProduct,
   scanProduct,
   searchBar,
+  searchProductsByStatus,
 } from "../../controllers/productsController/productsController.js";
 import routes from "../../routes/routes.js";
 import auth from "../../middlewares/Auth.js";
@@ -13,6 +14,7 @@ import auth from "../../middlewares/Auth.js";
 // eslint-disable-next-line new-cap
 const productsRouter = express.Router();
 
+productsRouter.get(routes.status, searchProductsByStatus);
 productsRouter.get(routes.scanProduct, scanProduct);
 
 productsRouter.get(routes.search, searchBar);

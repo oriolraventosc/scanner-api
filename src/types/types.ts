@@ -16,8 +16,8 @@ export interface UserTokenPayload extends JwtPayload {
 export interface ProductStructure {
   name: string;
   image: string;
-  price: number;
   ingredients: string;
+  description: string;
   brand: string;
   weight: number;
   benefits: string[];

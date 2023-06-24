@@ -9,6 +9,7 @@ const routes = {
   favouriteProducts: "/favourite-products/:email",
   addToFavourites: "/add-to-favourites/:email/:product",
   deleteFromFavourites: "/delete-from-favourites/:email/:productEan",
+  status: "/status-products-search",
 };
 
 export default routes;
