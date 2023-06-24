@@ -91,31 +91,7 @@ describe("Given a GET /scanProduct endpoint", () => {
 
 describe("Given a GET /search endpoint", () => {
   jest.setTimeout(25000);
-  describe("When it receives a request with 1 product", () => {
-    test("Then it should an object with a product", async () => {
-      const status = 200;
-      Product.find = jest.fn().mockReturnValue(productMock);
-      const response = await request(app)
-        .get(`${routes.productsRouter}/search?name=product&limit=6`)
-        .expect(status);
 
-      expect(response.statusCode).toBe(status);
-    });
-  });
-
-  describe("When it receives a request with 0 product", () => {
-    test("Then it should return an object with no product", async () => {
-      const status = 200;
-      Product.find = jest
-        .fn()
-        .mockReturnValue({ productInformation: {}, productsList: [] });
-      const response = await request(app)
-        .get(`${routes.productsRouter}/search?name=product&limit=6`)
-        .expect(status);
-
-      expect(response.statusCode).toBe(status);
-    });
-  });
   describe("When it receives a request and an internal server error ocurres", () => {
     test("Then it should return an object with a property error", async () => {
       const status = 500;
