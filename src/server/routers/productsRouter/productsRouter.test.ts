@@ -12,6 +12,7 @@ import app from "../../app";
 import routes from "../../routes/routes";
 import User from "../../../database/models/user/user";
 import { userMock } from "../../../mocks/usersMock/usersMock";
+import ScanProduct from "../../../database/models/scanProduct/scanProduct";
 
 const { secretKey } = enviroment;
 
@@ -90,31 +91,7 @@ describe("Given a GET /scanProduct endpoint", () => {
 
 describe("Given a GET /search endpoint", () => {
   jest.setTimeout(25000);
-  describe("When it receives a request with 1 product", () => {
-    test("Then it should an object with a product", async () => {
-      const status = 200;
-      Product.find = jest.fn().mockReturnValue(productMock);
-      const response = await request(app)
-        .get(`${routes.productsRouter}/search?name=product`)
-        .expect(status);
 
-      expect(response.statusCode).toBe(status);
-    });
-  });
-
-  describe("When it receives a request with 0 product", () => {
-    test("Then it should return an object with no product", async () => {
-      const status = 200;
-      Product.find = jest
-        .fn()
-        .mockReturnValue({ productInformation: {}, productsList: [] });
-      const response = await request(app)
-        .get(`${routes.productsRouter}/search?name=product`)
-        .expect(status);
-
-      expect(response.statusCode).toBe(status);
-    });
-  });
   describe("When it receives a request and an internal server error ocurres", () => {
     test("Then it should return an object with a property error", async () => {
       const status = 500;
@@ -208,6 +185,42 @@ describe("Given a GET /favourite-products/:email endpoint", () => {
       const response = await request(app)
         .get(`${routes.productsRouter}/favourite-products/user@gmail.com`)
         .set("Authorization", `Bearer ${userToken}`)
+        .expect(status);
+
+      expect(response.statusCode).toBe(status);
+    });
+  });
+});
+
+describe("Given a GET /status-products-search", () => {
+  describe("When it is invoked with 2 products", () => {
+    test("Then it should return a 200 stauts code", async () => {
+      const status = 200;
+      Product.find = jest.fn().mockReturnValue([productMock]);
+      ScanProduct.find = jest.fn().mockReturnValue([productMock]);
+
+      const response = await request(app)
+        .get(`${routes.productsRouter}/status-products-search`)
+        .query({ status: "Healthy" })
+        .expect(status);
+
+      expect(response.statusCode).toBe(status);
+    });
+  });
+
+  describe("When it is invoked with 2 products and an internal server error ocurres", () => {
+    test("Then it should return a 500 status code", async () => {
+      const status = 500;
+      const error = new CustomError(
+        "We could not find any product and supplement",
+        500,
+        "We could not find any product and supplement"
+      );
+      Product.find = jest.fn().mockRejectedValue(error);
+      ScanProduct.find = jest.fn().mockRejectedValue(error);
+      const response = await request(app)
+        .get(`${routes.productsRouter}/status-products-search`)
+        .query({ status: "Healthy" })
         .expect(status);
 
       expect(response.statusCode).toBe(status);

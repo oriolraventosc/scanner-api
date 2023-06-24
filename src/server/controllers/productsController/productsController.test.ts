@@ -9,6 +9,7 @@ import {
   loadFavouriteProducts,
   addToFavourites,
   deleteFavouriteProduct,
+  searchProductsByStatus,
 } from "./productsController";
 import Product from "../../../database/models/product/product";
 import CustomError from "../../customError/customError";
@@ -16,6 +17,7 @@ import { productMock } from "../../../mocks/productMock/productMock";
 import connectToDatabase from "../../../database";
 import User from "../../../database/models/user/user";
 import { userMock } from "../../../mocks/usersMock/usersMock";
+import ScanProduct from "../../../database/models/scanProduct/scanProduct";
 
 let server: MongoMemoryServer;
 
@@ -168,6 +170,7 @@ describe("Given a productsController", () => {
       const status = 200;
       const req: Partial<Request> = {
         params: { email: "user@gmail.com" },
+        query: { limit: "10" },
       };
 
       User.findOne = jest.fn().mockReturnValue(userMock);
@@ -186,6 +189,7 @@ describe("Given a productsController", () => {
       const status = 204;
       const req: Partial<Request> = {
         params: { email: "user@gmail.com" },
+        query: { limit: "10" },
       };
 
       User.findOne = jest.fn().mockReturnValue(userMock);
@@ -208,6 +212,7 @@ describe("Given a productsController", () => {
       );
       const req: Partial<Request> = {
         params: { email: "user@gmail.com" },
+        query: { limit: "10" },
       };
 
       User.findOne = jest.fn().mockRejectedValue(error);
@@ -304,6 +309,105 @@ describe("Given a productsController", () => {
 
       User.findOne = jest.fn().mockRejectedValue(error);
       await deleteFavouriteProduct(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe("When searchProductsByStatus is invoked with 2 products", () => {
+    test("Then it should return a 200 status", async () => {
+      const status = 200;
+      const req: Partial<Request> = {
+        query: { status: "Healthy" },
+      };
+
+      Product.find = jest.fn().mockReturnValue([]);
+      ScanProduct.find = jest.fn().mockReturnValue([]);
+      await searchProductsByStatus(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(res.status).toHaveBeenCalledWith(status);
+    });
+  });
+
+  describe("When searchProductsByStatus is invoked with 2 products", () => {
+    test("Then it should return a 200 status", async () => {
+      const status = 200;
+      const req: Partial<Request> = {
+        query: { status: "Healthy" },
+      };
+
+      Product.find = jest.fn().mockReturnValue([productMock]);
+      ScanProduct.find = jest.fn().mockReturnValue([]);
+      await searchProductsByStatus(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(res.status).toHaveBeenCalledWith(status);
+    });
+  });
+
+  describe("When searchProductsByStatus is invoked with 2 products", () => {
+    test("Then it should return a 200 status", async () => {
+      const status = 200;
+      const req: Partial<Request> = {
+        query: { status: "Healthy" },
+      };
+
+      Product.find = jest.fn().mockReturnValue([]);
+      ScanProduct.find = jest.fn().mockReturnValue([productMock]);
+      await searchProductsByStatus(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(res.status).toHaveBeenCalledWith(status);
+    });
+  });
+
+  describe("When searchProductsByStatus is invoked with 2 products", () => {
+    test("Then it should return a 200 status", async () => {
+      const status = 200;
+      const req: Partial<Request> = {
+        query: { status: "Healthy" },
+      };
+
+      Product.find = jest.fn().mockReturnValue([productMock]);
+      ScanProduct.find = jest.fn().mockReturnValue([productMock]);
+      await searchProductsByStatus(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(res.status).toHaveBeenCalledWith(status);
+    });
+  });
+
+  describe("When searchProductsByStatus is invoked and an internal server error ocurres", () => {
+    test("Then it should return it's next method", async () => {
+      const req: Partial<Request> = {
+        query: { status: "Healthy" },
+      };
+      const error = new CustomError(
+        "We could not find any product and supplement",
+        500,
+        "We could not find any product and supplement"
+      );
+
+      Product.find = jest.fn().mockRejectedValue(error);
+      ScanProduct.find = jest.fn().mockRejectedValue(error);
+      await searchProductsByStatus(
         req as Request,
         res as Response,
         next as NextFunction
