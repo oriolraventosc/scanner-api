@@ -157,6 +157,7 @@ export const addToFavourites = async (
   try {
     const user = await User.findOne({ email });
     const productToAdd = await Product.findOne({ ean: product });
+    // eslint-disable-next-line no-negated-condition
     if (!productToAdd) {
       const scanProduct = await ScanProduct.findOne({ ean: product });
       if (!scanProduct) {
@@ -174,18 +175,18 @@ export const addToFavourites = async (
       res.status(200).json({
         updatedUserInfo,
       });
+    } else {
+      const updatedUser = {
+        email: user.email,
+        name: user.name,
+        password: user.password,
+        favouriteProducts: [...user.favouriteProducts, productToAdd],
+      };
+      await User.findOneAndUpdate({ email }, { ...updatedUser });
+      res.status(200).json({
+        updatedUser,
+      });
     }
-
-    const updatedUser = {
-      email: user.email,
-      name: user.name,
-      password: user.password,
-      favouriteProducts: [...user.favouriteProducts, productToAdd],
-    };
-    await User.findOneAndUpdate({ email }, { ...updatedUser });
-    res.status(200).json({
-      updatedUser,
-    });
   } catch {
     const error = new CustomError(
       "We could not add the product to favourites",
