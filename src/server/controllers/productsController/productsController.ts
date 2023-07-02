@@ -53,7 +53,9 @@ export const searchBar = async (
     const products = await Product.find({
       name,
     });
-    if (!products) {
+    const scanProducts = await ScanProduct.find({ name });
+    const resultProducts = [...products, ...scanProducts];
+    if (!products && !scanProducts) {
       res.status(200).json({
         productInformation: [],
         productsList: [],
@@ -63,7 +65,7 @@ export const searchBar = async (
     }
 
     res.status(200).json({
-      productsList: products.slice(0, Number(limitNumber)),
+      productsList: resultProducts.slice(0, Number(limitNumber)),
       productInformation: [],
     });
   } catch {
@@ -85,11 +87,15 @@ export const loadProduct = async (
   try {
     const product = await Product.findOne({ name });
     if (!product) {
+      const scanProduct = await ScanProduct.findOne({ name });
+      if (!scanProduct) {
+        debug(`0 products found!`);
+      }
+
       res.status(200).json({
-        productInformation: [],
         productsList: [],
+        productInformation: scanProduct,
       });
-      debug(`0 products found!`);
     }
 
     res.status(200).json({
@@ -151,6 +157,25 @@ export const addToFavourites = async (
   try {
     const user = await User.findOne({ email });
     const productToAdd = await Product.findOne({ ean: product });
+    if (!productToAdd) {
+      const scanProduct = await ScanProduct.findOne({ ean: product });
+      if (!scanProduct) {
+        debug(`0 products found!`);
+      }
+
+      const updatedUserInfo = {
+        email: user.email,
+        name: user.name,
+        password: user.password,
+        favouriteProducts: [...user.favouriteProducts, scanProduct],
+      };
+
+      await User.findOneAndUpdate({ email }, { ...updatedUserInfo });
+      res.status(200).json({
+        updatedUserInfo,
+      });
+    }
+
     const updatedUser = {
       email: user.email,
       name: user.name,
