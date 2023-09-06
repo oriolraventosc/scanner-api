@@ -10,6 +10,8 @@ const routes = {
   addToFavourites: "/add-to-favourites/:email/:product",
   deleteFromFavourites: "/delete-from-favourites/:email/:productEan",
   status: "/status-products-search",
+  loadUser: "/load-user/:email",
+  updateUser: "/update-user/:email",
 };
 
 export default routes;

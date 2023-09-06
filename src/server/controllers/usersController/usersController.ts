@@ -107,3 +107,57 @@ export const register = async (
     next(error);
   }
 };
+
+export const loadUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email } = req.params;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      debug("No user found!");
+      res.status(400).json({ error: "Error! No user found..." });
+    }
+
+    res.status(200).json({ user });
+  } catch {
+    const error = new CustomError("No user found!", 500, "No user found!");
+    next(error);
+  }
+};
+
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email: findUserEmail } = req.params;
+  const { email, name, password } = req.body as UserStructure;
+  try {
+    const user = await User.findOne({ email: findUserEmail });
+    if (!user) {
+      debug("No user found!");
+      res.status(400).json({ error: "Error! No user found..." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const updatedUser = {
+      email,
+      password: hashedPassword,
+      name,
+      favouriteProducts: user.favouriteProducts,
+    };
+
+    await User.findOneAndUpdate({ email }, { ...updatedUser });
+    res.status(200).json({ updatedUser });
+  } catch {
+    const error = new CustomError(
+      "Error updating user information!",
+      500,
+      "Error updating user information"
+    );
+    next(error);
+  }
+};
