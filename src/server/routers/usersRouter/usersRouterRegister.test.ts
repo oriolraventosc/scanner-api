@@ -106,3 +106,41 @@ describe("Given a POST '/register' endpoint", () => {
     });
   });
 });
+
+describe("Given a PATCH 'user-update' endpoint", () => {
+  describe("When it receives a request with all the user updated data but an internal server error happens", () => {
+    test("Then it should respond with an error", async () => {
+      const status = 500;
+      const error = new CustomError(
+        "Error updating user information!",
+        500,
+        "Error updating user information"
+      );
+
+      User.findOne = jest.fn().mockRejectedValue(error);
+      const response = await request(app)
+        .patch(`${routes.usersRouter}${routes.updateUser}`)
+        .send(userMock)
+        .expect(status);
+
+      expect(response.status).toBe(500);
+    });
+  });
+});
+
+describe("Given a GET 'load-user' endpoint", () => {
+  describe("When it receives a request with the correct user email but an internal server error happens", () => {
+    test("Then it should respond with an error", async () => {
+      const status = 500;
+      const error = new CustomError("No user found!", 500, "No user found!");
+
+      User.findOne = jest.fn().mockRejectedValue(error);
+      const response = await request(app)
+        .get(`${routes.usersRouter}${routes.loadUser}`)
+        .send(userMock)
+        .expect(status);
+
+      expect(response.status).toBe(500);
+    });
+  });
+});

@@ -8,7 +8,7 @@ import {
   userWithoutPasswordMock,
 } from "../../../mocks/usersMock/usersMock";
 import CustomError from "../../customError/customError";
-import { login, register } from "./usersController";
+import { loadUser, login, register, updateUser } from "./usersController";
 import bcrypt from "bcrypt";
 
 const tokenPayload = {};
@@ -133,6 +133,75 @@ describe("Given the users controller", () => {
 
       User.findOne = jest.fn().mockRejectedValue(customError);
       await login(req as Request, res as Response, next as NextFunction);
+
+      expect(next).toHaveBeenCalledWith(customError);
+    });
+  });
+
+  describe("When it is invoked with updateUser", () => {
+    test("Then it should call it's method with a status 200 and the token as the json", async () => {
+      const status = 200;
+
+      const req: Partial<Request> = {
+        body: { email: "admin@gmail.com", password: "admin", name: "aDmIn" },
+        params: { email: "admin@gmail.com" },
+      };
+
+      User.findOne = jest.fn().mockReturnValue(userMock);
+      const hashedPassword = await bcrypt.hash(userMock.password, 10);
+      User.findOneAndUpdate = jest
+        .fn()
+        .mockReturnValue({ ...userMock, password: hashedPassword });
+
+      await updateUser(req as Request, res as Response, next as NextFunction);
+
+      expect(res.status).toHaveBeenLastCalledWith(status);
+    });
+
+    test("Then it should respond with a 500 status when an internal server error happens", async () => {
+      const customError = new CustomError(
+        "Error updating user information!",
+        500,
+        "Error updating user information!"
+      );
+      const req: Partial<Request> = {
+        body: { email: "admin@gmail.com", password: "admin", name: "admin" },
+        params: { email: "admin@gmail.com" },
+      };
+
+      User.findOne = jest.fn().mockReturnValue(userMock);
+      User.findOneAndUpdate = jest.fn().mockRejectedValue(customError);
+      await updateUser(req as Request, res as Response, next as NextFunction);
+
+      expect(next).toHaveBeenCalledWith(customError);
+    });
+  });
+
+  describe("When it is invoked with loadUser", () => {
+    test("Then it should return an object with the admin user data", async () => {
+      const status = 200;
+      const req: Partial<Request> = {
+        params: { email: "admin@gmail.com" },
+      };
+
+      User.findOne = jest.fn().mockReturnValue(userMock);
+      await loadUser(req as Request, res as Response, next as NextFunction);
+
+      expect(res.status).toHaveBeenCalledWith(status);
+    });
+
+    test("Then it should respond with a 500 status when an internal server error happens", async () => {
+      const customError = new CustomError(
+        "No user found!",
+        500,
+        "No user found!"
+      );
+      const req: Partial<Request> = {
+        params: { email: "admin@gmail.com" },
+      };
+
+      User.findOne = jest.fn().mockRejectedValue(customError);
+      await loadUser(req as Request, res as Response, next as NextFunction);
 
       expect(next).toHaveBeenCalledWith(customError);
     });
