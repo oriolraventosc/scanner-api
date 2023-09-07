@@ -134,7 +134,7 @@ export const updateUser = async (
   next: NextFunction
 ) => {
   const { email: findUserEmail } = req.params;
-  const { email, name, password } = req.body as UserStructure;
+  const { email, name } = req.body as UserStructure;
   try {
     const user = await User.findOne({ email: findUserEmail });
     if (!user) {
@@ -142,10 +142,9 @@ export const updateUser = async (
       res.status(400).json({ error: "Error! No user found..." });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
     const updatedUser = {
       email,
-      password: hashedPassword,
+      password: user.password,
       name,
       favouriteProducts: user.favouriteProducts,
     };
@@ -157,6 +156,40 @@ export const updateUser = async (
       "Error updating user information!",
       500,
       "Error updating user information"
+    );
+    next(error);
+  }
+};
+
+export const updatePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email } = req.params;
+  const { password } = req.body as UserStructure;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      debug("No user found!");
+      res.status(400).json({ error: "Error! No user found..." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const updatedUser = {
+      email: user.email,
+      password: hashedPassword,
+      name: user.name,
+      favouriteProducts: user.favouriteProducts,
+    };
+
+    await User.findOneAndUpdate({ email }, { ...updatedUser });
+    res.status(200).json({ updatedUser });
+  } catch {
+    const error = new CustomError(
+      "Error updating user password!",
+      500,
+      "Error updating user password!"
     );
     next(error);
   }

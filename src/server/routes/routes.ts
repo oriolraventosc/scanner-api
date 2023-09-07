@@ -12,6 +12,7 @@ const routes = {
   status: "/status-products-search",
   loadUser: "/load-user/:email",
   updateUser: "/update-user/:email",
+  updatePassword: "/update-password/:email",
 };
 
 export default routes;
