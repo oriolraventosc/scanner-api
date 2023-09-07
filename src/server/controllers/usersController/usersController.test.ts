@@ -8,7 +8,13 @@ import {
   userWithoutPasswordMock,
 } from "../../../mocks/usersMock/usersMock";
 import CustomError from "../../customError/customError";
-import { loadUser, login, register, updateUser } from "./usersController";
+import {
+  loadUser,
+  login,
+  register,
+  updatePassword,
+  updateUser,
+} from "./usersController";
 import bcrypt from "bcrypt";
 
 const tokenPayload = {};
@@ -143,15 +149,12 @@ describe("Given the users controller", () => {
       const status = 200;
 
       const req: Partial<Request> = {
-        body: { email: "admin@gmail.com", password: "admin", name: "aDmIn" },
+        body: { email: "admin@gmail.com", name: "aDmIn" },
         params: { email: "admin@gmail.com" },
       };
 
       User.findOne = jest.fn().mockReturnValue(userMock);
-      const hashedPassword = await bcrypt.hash(userMock.password, 10);
-      User.findOneAndUpdate = jest
-        .fn()
-        .mockReturnValue({ ...userMock, password: hashedPassword });
+      User.findOneAndUpdate = jest.fn().mockReturnValue({ ...userMock });
 
       await updateUser(req as Request, res as Response, next as NextFunction);
 
@@ -165,7 +168,7 @@ describe("Given the users controller", () => {
         "Error updating user information!"
       );
       const req: Partial<Request> = {
-        body: { email: "admin@gmail.com", password: "admin", name: "admin" },
+        body: { email: "admin@gmail.com", name: "admin" },
         params: { email: "admin@gmail.com" },
       };
 
@@ -204,6 +207,53 @@ describe("Given the users controller", () => {
       await loadUser(req as Request, res as Response, next as NextFunction);
 
       expect(next).toHaveBeenCalledWith(customError);
+    });
+  });
+
+  describe("When it is invoked with updatePassword", () => {
+    test("Then it should call it's method with a status 200 and the token as the json", async () => {
+      const status = 200;
+
+      const req: Partial<Request> = {
+        body: { password: "admIn" },
+        params: { email: "admin@gmail.com" },
+      };
+
+      User.findOne = jest.fn().mockReturnValue(userMock);
+      const hashedPassword = await bcrypt.hash(userMock.password, 10);
+      User.findOneAndUpdate = jest
+        .fn()
+        .mockReturnValue({ ...userMock, password: hashedPassword });
+
+      await updatePassword(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(res.status).toHaveBeenLastCalledWith(status);
+    });
+
+    test("Then it should respond with a 500 status when an internal server error happens", async () => {
+      const error = new CustomError(
+        "Error updating user password!",
+        500,
+        "Error updating user password!"
+      );
+      const req: Partial<Request> = {
+        body: { password: "admin" },
+        params: { email: "admin@gmail.com" },
+      };
+
+      User.findOne = jest.fn().mockRejectedValue(error);
+
+      await updatePassword(
+        req as Request,
+        res as Response,
+        next as NextFunction
+      );
+
+      expect(next).toHaveBeenCalledWith(error);
     });
   });
 });

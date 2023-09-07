@@ -144,3 +144,23 @@ describe("Given a GET 'load-user' endpoint", () => {
     });
   });
 });
+
+describe("Given a PATCH 'update-password' endpoint", () => {
+  describe("When it receives a request with the correct user email but an internal server error happens", () => {
+    test("Then it should respond with an error", async () => {
+      const status = 500;
+      const error = new CustomError(
+        "Error updating user password!",
+        500,
+        "Error updating user password!"
+      );
+      User.findOne = jest.fn().mockRejectedValue(error);
+      const response = await request(app)
+        .patch(`${routes.usersRouter}${routes.updatePassword}`)
+        .send(userMock)
+        .expect(status);
+
+      expect(response.status).toBe(500);
+    });
+  });
+});
