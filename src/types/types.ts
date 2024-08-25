@@ -8,6 +8,11 @@ export interface UserStructure {
   favouriteProducts: ProductStructure[];
 }
 
+export interface KeywordStructure {
+  name: string;
+  description: string;
+}
+
 export interface UserTokenPayload extends JwtPayload {
   id: string;
   email: string;
@@ -25,6 +30,8 @@ export interface ProductStructure {
   status: string;
   howToUse: string;
   sideEffects: string;
+  keywords: string[];
+  keywordsWithDescription: KeywordStructure[];
 }
 
 export interface CustomRequest extends Request {

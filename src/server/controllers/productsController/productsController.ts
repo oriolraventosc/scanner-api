@@ -6,6 +6,7 @@ import enviroment from "../../../loadEnviroment.js";
 import CustomError from "../../customError/customError.js";
 import User from "../../../database/models/user/user.js";
 import ScanProduct from "../../../database/models/scanProduct/scanProduct.js";
+import Keyword from "../../../database/models/keywords/keywords.js";
 
 const debug = debugCreator(`${enviroment.debug}productsController`);
 
@@ -92,10 +93,26 @@ export const loadProduct = async (
         debug(`0 products found!`);
       }
 
+      for (const item of scanProduct.keywords) {
+        // eslint-disable-next-line no-await-in-loop
+        const keywordItem = await Keyword.findOne({ item });
+        if (keywordItem) {
+          scanProduct.keywordsWithDescription.push(keywordItem);
+        }
+      }
+
       res.status(200).json({
         productsList: [],
         productInformation: scanProduct,
       });
+    }
+
+    for (const item of product.keywords) {
+      // eslint-disable-next-line no-await-in-loop
+      const keywordItem = await Keyword.findOne({ item });
+      if (keywordItem) {
+        product.keywordsWithDescription.push(keywordItem);
+      }
     }
 
     res.status(200).json({
