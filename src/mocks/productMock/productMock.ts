@@ -10,4 +10,8 @@ export const productMock = {
   status: "Healthy",
   howToUse: "",
   sideEffects: "",
+  keywords: ["Magnesium"],
+  keywordsWithDescription: [
+    { name: "Magnesio", description: "Magnesio description..." },
+  ],
 };

@@ -12,6 +12,8 @@ const productSchema = new Schema({
   status: String,
   howToUse: String,
   sideEffects: String,
+  keywords: [String],
+  keywordsWithDescription: [{ name: String, description: String }],
 });
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
