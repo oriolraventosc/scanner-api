@@ -93,11 +93,19 @@ export const loadProduct = async (
         debug(`0 products found!`);
       }
 
-      for (const item of scanProduct.keywords) {
+      for (const keyword of scanProduct.keywords) {
         // eslint-disable-next-line no-await-in-loop
-        const keywordItem = await Keyword.findOne({ item });
+        const keywordItem = await Keyword.findOne({ name: keyword });
+
         if (keywordItem) {
-          scanProduct.keywordsWithDescription.push(keywordItem);
+          const alreadyExists = scanProduct.keywordsWithDescription.some(
+            (item) => item.name.toString() === keywordItem.name.toString()
+          );
+
+          // eslint-disable-next-line max-depth
+          if (!alreadyExists) {
+            scanProduct.keywordsWithDescription.push(keywordItem);
+          }
         }
       }
 
@@ -107,11 +115,18 @@ export const loadProduct = async (
       });
     }
 
-    for (const item of product.keywords) {
+    for (const keyword of product.keywords) {
       // eslint-disable-next-line no-await-in-loop
-      const keywordItem = await Keyword.findOne({ item });
+      const keywordItem = await Keyword.findOne({ name: keyword });
+
       if (keywordItem) {
-        product.keywordsWithDescription.push(keywordItem);
+        const alreadyExists = product.keywordsWithDescription.some(
+          (item) => item.name.toString() === keywordItem.name.toString()
+        );
+
+        if (!alreadyExists) {
+          product.keywordsWithDescription.push(keywordItem);
+        }
       }
     }
 
